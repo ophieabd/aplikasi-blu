@@ -138,7 +138,7 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
 
       {/* Floating bulk action bar */}
       {selected.size > 0 && (
-        <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-white/10 bg-zinc-900/95 backdrop-blur px-4 py-3 shadow-xl">
+        <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-white/10 bg-background/95 backdrop-blur px-4 py-3 shadow-xl">
           <span className="text-sm text-white/60 flex-1">
             {selected.size} transaksi dipilih
           </span>

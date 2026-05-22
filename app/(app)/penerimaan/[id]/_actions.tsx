@@ -86,7 +86,7 @@ export function PenerimaanActions({ id, status, isAdmin, canEdit, isOwner }: Pro
 
       {/* Dialog void */}
       <Dialog open={voidOpen} onOpenChange={setVoidOpen}>
-        <DialogContent className="bg-zinc-900 border-white/10 text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>Batalkan Transaksi</DialogTitle>
           </DialogHeader>

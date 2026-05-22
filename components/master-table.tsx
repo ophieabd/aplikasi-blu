@@ -120,7 +120,7 @@ export function MasterTable<T extends MasterRow>({
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="bg-zinc-900 border-white/10 text-white">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>{selected ? `Edit ${dialogTitle}` : `Tambah ${dialogTitle}`}</DialogTitle>
           </DialogHeader>

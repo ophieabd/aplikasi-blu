@@ -49,7 +49,7 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
             <SelectTrigger className="w-36 bg-white/5 border-white/10 text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10">
+            <SelectContent>
               {BULAN.map((b, i) => <SelectItem key={i + 1} value={String(i + 1)}>{b}</SelectItem>)}
             </SelectContent>
           </Select>
@@ -57,7 +57,7 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
             <SelectTrigger className="w-28 bg-white/5 border-white/10 text-white">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10">
+            <SelectContent>
               {tahunList.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
             </SelectContent>
           </Select>

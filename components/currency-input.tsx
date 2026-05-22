@@ -10,10 +10,11 @@ type Props = {
   className?: string
   placeholder?: string
   disabled?: boolean
+  "aria-invalid"?: boolean
 }
 
 export const CurrencyInput = forwardRef<HTMLInputElement, Props>(
-  ({ value, onChange, className, placeholder = "0", disabled }, ref) => {
+  ({ value, onChange, className, placeholder = "0", disabled, "aria-invalid": ariaInvalid }, ref) => {
     const [display, setDisplay] = useState(() =>
       value ? value.toLocaleString("id-ID") : ""
     )
@@ -38,6 +39,7 @@ export const CurrencyInput = forwardRef<HTMLInputElement, Props>(
           onChange={handleChange}
           placeholder={placeholder}
           disabled={disabled}
+          aria-invalid={ariaInvalid}
           className={cn("pl-9", className)}
         />
       </div>

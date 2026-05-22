@@ -101,8 +101,8 @@ function NavItem({ item }: { item: MenuItem }) {
           className={cn(
             "flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
             isActive
-              ? "bg-white/10 text-white"
-              : "text-white/50 hover:bg-white/5 hover:text-white/80"
+              ? "bg-sidebar-accent text-sidebar-foreground"
+              : "text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/80"
           )}
         >
           <Icon className="h-4 w-4 shrink-0" />
@@ -110,7 +110,7 @@ function NavItem({ item }: { item: MenuItem }) {
           <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", open && "rotate-180")} />
         </button>
         {open && (
-          <div className="ml-6 mt-0.5 flex flex-col gap-0.5 border-l border-white/10 pl-3">
+          <div className="ml-6 mt-0.5 flex flex-col gap-0.5 border-l border-sidebar-border pl-3">
             {item.children.map((child) => (
               <Link
                 key={child.href}
@@ -118,8 +118,8 @@ function NavItem({ item }: { item: MenuItem }) {
                 className={cn(
                   "rounded-md px-2 py-1.5 text-xs transition-colors",
                   pathname === child.href || pathname.startsWith(child.href)
-                    ? "text-white"
-                    : "text-white/40 hover:text-white/70"
+                    ? "text-sidebar-foreground"
+                    : "text-sidebar-foreground/40 hover:text-sidebar-foreground/70"
                 )}
               >
                 {child.label}
@@ -137,8 +137,8 @@ function NavItem({ item }: { item: MenuItem }) {
       className={cn(
         "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-white/10 text-white"
-          : "text-white/50 hover:bg-white/5 hover:text-white/80"
+          ? "bg-sidebar-accent text-sidebar-foreground"
+          : "text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/80"
       )}
     >
       <Icon className="h-4 w-4 shrink-0" />
@@ -151,20 +151,20 @@ function Sidebar({ profile, onClose }: { profile: Profile; onClose?: () => void 
   const menuItems = getMenuItems(profile.role.kode)
 
   return (
-    <div className="flex h-full flex-col bg-zinc-950">
+    <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+      <div className="flex items-center justify-between border-b border-sidebar-border px-4 py-4">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 ring-1 ring-white/20">
-            <Building2 className="h-4 w-4 text-white" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-accent ring-1 ring-sidebar-border">
+            <Building2 className="h-4 w-4 text-sidebar-foreground" />
           </div>
           <div>
-            <p className="text-xs font-semibold text-white">BLU UIN Palopo</p>
-            <p className="text-[10px] text-white/30">Penerimaan Dana</p>
+            <p className="text-xs font-semibold text-sidebar-foreground">BLU UIN Palopo</p>
+            <p className="text-[10px] text-sidebar-foreground/30">Penerimaan Dana</p>
           </div>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-white/40 hover:text-white lg:hidden">
+          <button onClick={onClose} className="text-sidebar-foreground/40 hover:text-sidebar-foreground lg:hidden">
             <X className="h-4 w-4" />
           </button>
         )}
@@ -180,15 +180,15 @@ function Sidebar({ profile, onClose }: { profile: Profile; onClose?: () => void 
       </nav>
 
       {/* User info + logout */}
-      <div className="border-t border-white/10 p-3">
-        <div className="mb-2 rounded-lg bg-white/5 px-3 py-2">
-          <p className="text-xs font-medium text-white/80 truncate">{profile.nama_lengkap}</p>
-          <p className="text-[10px] text-white/30 truncate">{profile.role.nama}</p>
+      <div className="border-t border-sidebar-border p-3">
+        <div className="mb-2 rounded-lg bg-sidebar-accent px-3 py-2">
+          <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{profile.nama_lengkap}</p>
+          <p className="text-[10px] text-sidebar-foreground/30 truncate">{profile.role.nama}</p>
         </div>
         <form action={actionLogout}>
           <button
             type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-sidebar-foreground/40 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground/70"
           >
             <LogOut className="h-3.5 w-3.5" />
             Keluar
@@ -209,7 +209,7 @@ export function AppShell({
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen bg-zinc-900 text-white">
+    <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar desktop */}
       <aside className="hidden w-56 shrink-0 lg:block">
         <Sidebar profile={profile} />
@@ -231,14 +231,14 @@ export function AppShell({
       {/* Main content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Topbar mobile */}
-        <header className="flex items-center gap-3 border-b border-white/10 px-4 py-3 lg:hidden">
+        <header className="flex items-center gap-3 border-b border-border px-4 py-3 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="text-white/50 hover:text-white"
+            className="text-foreground/50 hover:text-foreground"
           >
             <Menu className="h-5 w-5" />
           </button>
-          <span className="text-sm font-medium text-white/70">BLU UIN Palopo</span>
+          <span className="text-sm font-medium text-foreground/70">BLU UIN Palopo</span>
         </header>
 
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">

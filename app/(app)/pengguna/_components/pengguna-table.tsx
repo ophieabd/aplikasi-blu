@@ -86,7 +86,7 @@ function InviteForm({ roles, unitKerja, onDone }: { roles: Role[]; unitKerja: Un
           <Controller name="role_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Pilih role" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
+              <SelectContent className="border-white/10">
                 {roles.map((r) => <SelectItem key={r.id} value={r.id}>{r.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -98,7 +98,7 @@ function InviteForm({ roles, unitKerja, onDone }: { roles: Role[]; unitKerja: Un
           <Controller name="unit_kerja_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="— Semua unit —" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
+              <SelectContent className="border-white/10">
                 {unitKerja.map((u) => <SelectItem key={u.id} value={u.id}>{u.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -151,7 +151,7 @@ function EditForm({ row, roles, unitKerja, onDone }: { row: Pengguna; roles: Rol
           <Controller name="role_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
+              <SelectContent className="border-white/10">
                 {roles.map((r) => <SelectItem key={r.id} value={r.id}>{r.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -162,7 +162,7 @@ function EditForm({ row, roles, unitKerja, onDone }: { row: Pengguna; roles: Rol
           <Controller name="unit_kerja_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
               <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="— Semua —" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
+              <SelectContent className="border-white/10">
                 {unitKerja.map((u) => <SelectItem key={u.id} value={u.id}>{u.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -274,7 +274,7 @@ export function PenggunaTable({ data, roles, unitKerja }: { data: Pengguna[]; ro
       )}
 
       <Dialog open={!!modal} onOpenChange={(o) => !o && setModal(null)}>
-        <DialogContent className="bg-zinc-900 border-white/10 text-white max-w-md">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
               {modal?.type === "invite" && "Tambah Pengguna"}

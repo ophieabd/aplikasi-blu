@@ -5,10 +5,9 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useRouter } from "next/navigation"
-import { Label } from "@/components/ui/label"
+import { ChevronLeft } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CurrencyInput } from "@/components/currency-input"
 import { toast } from "sonner"
@@ -39,6 +38,26 @@ type Props = {
   lockedUnitId?: string
 }
 
+const inputCls = "bg-white/5 border-white/10 text-white/90 placeholder:text-white/20 focus-visible:border-white/30 focus-visible:ring-white/10"
+
+function Field({ label, required, error, children }: {
+  label: string
+  required?: boolean
+  error?: string
+  children: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-xs font-medium text-white/50 uppercase tracking-wide">
+        {label}
+        {required && <span className="ml-1 text-red-400">*</span>}
+      </p>
+      {children}
+      {error && <p className="text-xs text-red-400">{error}</p>}
+    </div>
+  )
+}
+
 export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -62,7 +81,6 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
   const watchKategori = watch("kategori_id")
   const watchJenis = watch("jenis_pendapatan_id")
 
-  // Load semua master saat mount
   useEffect(() => {
     const sb = createClient()
     Promise.all([
@@ -73,12 +91,11 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
     ]).then(([kat, unit, rek, metode]) => {
       setKategoriList(kat.data ?? [])
       setUnitList(unit.data?.map((u) => ({ id: u.id, kode: u.kode, nama: u.nama })) ?? [])
-      setRekeningList(rek.data?.map((r) => ({ id: r.id, kode: r.kode, nama: `${r.nama_bank} - ${r.nama_rekening}` })) ?? [])
+      setRekeningList(rek.data?.map((r) => ({ id: r.id, kode: r.kode, nama: `${r.nama_bank} — ${r.nama_rekening}` })) ?? [])
       setMetodeList(metode.data ?? [])
     })
   }, [])
 
-  // Load jenis saat kategori berubah
   useEffect(() => {
     if (!watchKategori) { setJenisList([]); setSubList([]); return }
     const sb = createClient()
@@ -95,7 +112,6 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
       })
   }, [watchKategori, setValue])
 
-  // Load sub saat jenis berubah
   useEffect(() => {
     if (!watchJenis) { setSubList([]); return }
     const sb = createClient()
@@ -133,128 +149,176 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
     })
   }
 
-  const inputClass = "bg-white/5 border-white/10 text-white placeholder:text-white/20"
+  const sectionCls = "rounded-xl border border-white/10 overflow-hidden"
+  const sectionHeadCls = "px-5 py-3.5 border-b border-white/10"
+  const sectionTitleCls = "text-sm font-medium text-white/60"
+  const sectionBodyCls = "p-5 flex flex-col gap-5"
+  const triggerCls = `w-full ${inputCls}`
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-      {/* Tanggal */}
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Tanggal Transaksi <span className="text-red-400">*</span></Label>
-        <Input {...register("tanggal_terima")} type="date" className={inputClass} />
-        {errors.tanggal_terima && <p className="text-xs text-red-400">{errors.tanggal_terima.message}</p>}
-      </div>
+    <form onSubmit={handleSubmit(onSubmit)} className="mx-auto flex w-full max-w-5xl flex-col gap-6">
 
-      {/* Kategori → Jenis → Sub */}
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Kategori Pendapatan <span className="text-red-400">*</span></Label>
-        <Controller name="kategori_id" control={control} render={({ field }) => (
-          <Select onValueChange={field.onChange} value={field.value ?? ""}>
-            <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih kategori" /></SelectTrigger>
-            <SelectContent className="bg-zinc-900 border-white/10">
-              {kategoriList.map((k) => <SelectItem key={k.id} value={k.id}>{k.kode} — {k.nama}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        )} />
-        {errors.kategori_id && <p className="text-xs text-red-400">{errors.kategori_id.message}</p>}
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Jenis Pendapatan <span className="text-red-400">*</span></Label>
-          <Controller name="jenis_pendapatan_id" control={control} render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchKategori}>
-              <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih jenis" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
-                {jenisList.map((j) => <SelectItem key={j.id} value={j.id}>{j.kode} — {j.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )} />
-          {errors.jenis_pendapatan_id && <p className="text-xs text-red-400">{errors.jenis_pendapatan_id.message}</p>}
+      {/* Header */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-white/40 hover:bg-white/5 hover:text-white/70 transition-colors"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <div>
+            <h1 className="text-lg font-semibold text-white/90">
+              {editId ? "Edit Penerimaan" : "Input Penerimaan"}
+            </h1>
+            <p className="mt-0.5 text-sm text-white/40">Catat penerimaan dana baru sebagai draft</p>
+          </div>
         </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Sub Pendapatan</Label>
-          <Controller name="sub_pendapatan_id" control={control} render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchJenis || subList.length === 0}>
-              <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih sub (opsional)" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
-                {subList.map((s) => <SelectItem key={s.id} value={s.id}>{s.kode} — {s.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )} />
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="rounded-md px-3 py-1.5 text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/70 transition-colors"
+          >
+            Batal
+          </button>
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-white/90 disabled:opacity-50 transition-colors"
+          >
+            {pending ? "Menyimpan..." : editId ? "Perbarui" : "Simpan sebagai Draft"}
+          </button>
         </div>
       </div>
 
-      {/* Unit kerja + Rekening + Metode */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Unit Kerja <span className="text-red-400">*</span></Label>
-          <Controller name="unit_kerja_id" control={control} render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!!lockedUnitId}>
-              <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih unit" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
-                {unitList.map((u) => <SelectItem key={u.id} value={u.id}>{u.kode} — {u.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )} />
-          {errors.unit_kerja_id && <p className="text-xs text-red-400">{errors.unit_kerja_id.message}</p>}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Rekening Bank <span className="text-red-400">*</span></Label>
-          <Controller name="rekening_bank_id" control={control} render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih rekening" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
-                {rekeningList.map((r) => <SelectItem key={r.id} value={r.id}>{r.kode} — {r.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )} />
-          {errors.rekening_bank_id && <p className="text-xs text-red-400">{errors.rekening_bank_id.message}</p>}
-        </div>
-      </div>
+      {/* 2-kolom body */}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Metode Pembayaran <span className="text-red-400">*</span></Label>
-          <Controller name="jenis_pemindahan_kas_id" control={control} render={({ field }) => (
-            <Select onValueChange={field.onChange} value={field.value ?? ""}>
-              <SelectTrigger className={inputClass}><SelectValue placeholder="Pilih metode" /></SelectTrigger>
-              <SelectContent className="bg-zinc-900 border-white/10">
-                {metodeList.map((m) => <SelectItem key={m.id} value={m.id}>{m.nama}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          )} />
-          {errors.jenis_pemindahan_kas_id && <p className="text-xs text-red-400">{errors.jenis_pemindahan_kas_id.message}</p>}
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Jumlah <span className="text-red-400">*</span></Label>
-          <Controller name="jumlah" control={control} render={({ field }) => (
-            <CurrencyInput
-              value={field.value}
-              onChange={field.onChange}
-              className={inputClass}
-            />
-          )} />
-          {errors.jumlah && <p className="text-xs text-red-400">{errors.jumlah.message}</p>}
-        </div>
-      </div>
+        {/* Kolom kiri */}
+        <div className="flex flex-col gap-4">
 
-      {/* Nomor bukti + uraian */}
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nomor Bukti</Label>
-        <Input {...register("nomor_referensi")} placeholder="No. bukti / referensi transaksi" className={inputClass} />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Uraian</Label>
-        <Textarea {...register("uraian")} rows={2} placeholder="Keterangan tambahan (opsional)" className={`${inputClass} resize-none`} />
-      </div>
+          <div className={sectionCls}>
+            <div className={sectionHeadCls}>
+              <p className={sectionTitleCls}>Informasi Transaksi</p>
+            </div>
+            <div className={sectionBodyCls}>
+              <Field label="Tanggal Transaksi" required error={errors.tanggal_terima?.message}>
+                <Input {...register("tanggal_terima")} type="date" className={inputCls} aria-invalid={!!errors.tanggal_terima} />
+              </Field>
+              <Field label="Kategori Pendapatan" required error={errors.kategori_id?.message}>
+                <Controller name="kategori_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <SelectTrigger className={triggerCls} aria-invalid={!!errors.kategori_id}>
+                      <SelectValue>{field.value ? (kategoriList.find(k => k.id === field.value) ? `${kategoriList.find(k => k.id === field.value)!.kode} — ${kategoriList.find(k => k.id === field.value)!.nama}` : "Memuat...") : "Pilih kategori"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{kategoriList.map(k => <SelectItem key={k.id} value={k.id}>{k.kode} — {k.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+            </div>
+          </div>
 
-      <div className="flex gap-3 pt-2">
-        <Button type="button" variant="ghost" onClick={() => router.back()} className="flex-1 text-white/50">
-          Batal
-        </Button>
-        <Button type="submit" disabled={pending} className="flex-1">
-          {pending ? "Menyimpan..." : editId ? "Perbarui" : "Simpan sebagai Draft"}
-        </Button>
+          <div className={sectionCls}>
+            <div className={sectionHeadCls}>
+              <p className={sectionTitleCls}>Klasifikasi Pendapatan</p>
+            </div>
+            <div className={sectionBodyCls}>
+              <Field label="Jenis Pendapatan" required error={errors.jenis_pendapatan_id?.message}>
+                <Controller name="jenis_pendapatan_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchKategori}>
+                    <SelectTrigger className={triggerCls} aria-invalid={!!errors.jenis_pendapatan_id}>
+                      <SelectValue>{field.value ? (jenisList.find(j => j.id === field.value) ? `${jenisList.find(j => j.id === field.value)!.kode} — ${jenisList.find(j => j.id === field.value)!.nama}` : "Memuat...") : (watchKategori ? "Pilih jenis" : "Pilih kategori dulu")}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{jenisList.map(j => <SelectItem key={j.id} value={j.id}>{j.kode} — {j.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+              <Field label="Sub Pendapatan">
+                <Controller name="sub_pendapatan_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchJenis || subList.length === 0}>
+                    <SelectTrigger className={triggerCls}>
+                      <SelectValue>{field.value ? (subList.find(s => s.id === field.value) ? `${subList.find(s => s.id === field.value)!.kode} — ${subList.find(s => s.id === field.value)!.nama}` : "Memuat...") : "Pilih sub (opsional)"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{subList.map(s => <SelectItem key={s.id} value={s.id}>{s.kode} — {s.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Kolom kanan */}
+        <div className="flex flex-col gap-4">
+
+          <div className={sectionCls}>
+            <div className={sectionHeadCls}>
+              <p className={sectionTitleCls}>Pembayaran</p>
+            </div>
+            <div className={sectionBodyCls}>
+              <Field label="Jumlah" required error={errors.jumlah?.message}>
+                <Controller name="jumlah" control={control} render={({ field }) => (
+                  <CurrencyInput value={field.value} onChange={field.onChange} className={inputCls} aria-invalid={!!errors.jumlah} />
+                )} />
+              </Field>
+              <Field label="Metode Pembayaran" required error={errors.jenis_pemindahan_kas_id?.message}>
+                <Controller name="jenis_pemindahan_kas_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <SelectTrigger className={triggerCls} aria-invalid={!!errors.jenis_pemindahan_kas_id}>
+                      <SelectValue>{field.value ? (metodeList.find(m => m.id === field.value)?.nama ?? "Memuat...") : "Pilih metode"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{metodeList.map(m => <SelectItem key={m.id} value={m.id}>{m.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+            </div>
+          </div>
+
+          <div className={sectionCls}>
+            <div className={sectionHeadCls}>
+              <p className={sectionTitleCls}>Unit & Rekening</p>
+            </div>
+            <div className={sectionBodyCls}>
+              <Field label="Unit Kerja" required error={errors.unit_kerja_id?.message}>
+                <Controller name="unit_kerja_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!!lockedUnitId}>
+                    <SelectTrigger className={triggerCls} aria-invalid={!!errors.unit_kerja_id}>
+                      <SelectValue>{field.value ? (unitList.find(u => u.id === field.value) ? `${unitList.find(u => u.id === field.value)!.kode} — ${unitList.find(u => u.id === field.value)!.nama}` : "Memuat...") : "Pilih unit"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{unitList.map(u => <SelectItem key={u.id} value={u.id}>{u.kode} — {u.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+              <Field label="Rekening Bank" required error={errors.rekening_bank_id?.message}>
+                <Controller name="rekening_bank_id" control={control} render={({ field }) => (
+                  <Select onValueChange={field.onChange} value={field.value ?? ""}>
+                    <SelectTrigger className={triggerCls} aria-invalid={!!errors.rekening_bank_id}>
+                      <SelectValue>{field.value ? (rekeningList.find(r => r.id === field.value)?.nama ?? "Memuat...") : "Pilih rekening"}</SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>{rekeningList.map(r => <SelectItem key={r.id} value={r.id}>{r.kode} — {r.nama}</SelectItem>)}</SelectContent>
+                  </Select>
+                )} />
+              </Field>
+            </div>
+          </div>
+
+          <div className={sectionCls}>
+            <div className={sectionHeadCls}>
+              <p className={sectionTitleCls}>Referensi</p>
+            </div>
+            <div className={sectionBodyCls}>
+              <Field label="Nomor Bukti">
+                <Input {...register("nomor_referensi")} placeholder="No. bukti / referensi transaksi" className={inputCls} />
+              </Field>
+              <Field label="Uraian">
+                <Textarea {...register("uraian")} rows={3} placeholder="Keterangan tambahan (opsional)" className={`${inputCls} resize-none`} />
+              </Field>
+            </div>
+          </div>
+
+        </div>
       </div>
     </form>
   )

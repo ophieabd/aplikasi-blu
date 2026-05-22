@@ -5,7 +5,7 @@ type Status = "draft" | "verified" | "void"
 const config: Record<Status, { label: string; classes: string }> = {
   draft:    { label: "Draft",      classes: "bg-amber-500/10  text-amber-400  ring-amber-500/20" },
   verified: { label: "Terverifikasi", classes: "bg-green-500/10  text-green-400  ring-green-500/20" },
-  void:     { label: "Dibatalkan", classes: "bg-zinc-500/10   text-zinc-400   ring-zinc-500/20" },
+  void:     { label: "Dibatalkan", classes: "bg-white/5 text-white/40 ring-white/10" },
 }
 
 export function PenerimaanStatusBadge({ status }: { status: Status }) {

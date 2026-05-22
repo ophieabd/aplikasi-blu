@@ -1,6 +1,5 @@
 import { requireRole } from "@/lib/session"
 import { rekapBulanan } from "@/app/actions/laporan"
-import { PageHeader } from "@/components/page-header"
 import { LaporanBulananClient } from "./_client"
 
 export default async function LaporanBulananPage({
@@ -15,10 +14,5 @@ export default async function LaporanBulananPage({
   const bulan = parseInt(params.bulan ?? String(now.getMonth() + 1))
   const { byKategori, total } = await rekapBulanan(tahun, bulan)
 
-  return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title="Laporan Bulanan" description="Rekap penerimaan per bulan, dikelompokkan per kategori" />
-      <LaporanBulananClient tahun={tahun} bulan={bulan} byKategori={byKategori} total={total} />
-    </div>
-  )
+  return <LaporanBulananClient tahun={tahun} bulan={bulan} byKategori={byKategori} total={total} />
 }

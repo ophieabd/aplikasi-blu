@@ -1,6 +1,5 @@
 import { requireRole } from "@/lib/session"
 import { rekapPerRekening } from "@/app/actions/laporan"
-import { PageHeader } from "@/components/page-header"
 import { LaporanRekeningClient } from "./_client"
 
 export default async function LaporanPerRekeningPage({
@@ -15,10 +14,5 @@ export default async function LaporanPerRekeningPage({
   const tglAkhir = params.tgl_akhir ?? now.toISOString().split("T")[0]
   const { byRekening, total } = await rekapPerRekening(tglAwal, tglAkhir)
 
-  return (
-    <div className="flex flex-col gap-6">
-      <PageHeader title="Rekap per Rekening" description="Total penerimaan per rekening bank untuk rekonsiliasi" />
-      <LaporanRekeningClient tglAwal={tglAwal} tglAkhir={tglAkhir} byRekening={byRekening} total={total} />
-    </div>
-  )
+  return <LaporanRekeningClient tglAwal={tglAwal} tglAkhir={tglAkhir} byRekening={byRekening} total={total} />
 }

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation"
 import {
   Building2, LayoutDashboard, BarChart3,
   Users, LogOut, Menu, X, ChevronDown,
-  Banknote, BookOpen
+  Banknote, BookOpen, PanelLeft,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { actionLogout } from "@/app/actions/auth"
@@ -23,7 +23,6 @@ function getMenuItems(role: string): MenuItem[] {
   const common: MenuItem[] = [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   ]
-
   const adminMenu: MenuItem[] = [
     {
       label: "Penerimaan", href: "/penerimaan", icon: Banknote,
@@ -54,7 +53,6 @@ function getMenuItems(role: string): MenuItem[] {
       ]
     },
   ]
-
   const operatorMenu: MenuItem[] = [
     {
       label: "Penerimaan", href: "/penerimaan", icon: Banknote,
@@ -65,7 +63,6 @@ function getMenuItems(role: string): MenuItem[] {
       ]
     },
   ]
-
   const pimpinanMenu: MenuItem[] = [
     {
       label: "Laporan", href: "/laporan", icon: BarChart3,
@@ -76,14 +73,13 @@ function getMenuItems(role: string): MenuItem[] {
       ]
     },
   ]
-
   if (role === "ADMIN") return [...common, ...adminMenu]
   if (role === "OPERATOR") return [...common, ...operatorMenu]
   if (role === "PIMPINAN") return [...common, ...pimpinanMenu]
   return common
 }
 
-function NavItem({ item }: { item: MenuItem }) {
+function NavItem({ item, collapsed }: { item: MenuItem; collapsed: boolean }) {
   const pathname = usePathname()
   const [open, setOpen] = useState(() =>
     item.children?.some((c) => pathname.startsWith(c.href)) ?? false
@@ -94,6 +90,24 @@ function NavItem({ item }: { item: MenuItem }) {
     : pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href))
 
   if (item.children) {
+    // Collapsed: link to first child, show only icon
+    if (collapsed) {
+      return (
+        <Link
+          href={item.children[0].href}
+          title={item.label}
+          className={cn(
+            "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+            isActive
+              ? "bg-sidebar-accent text-sidebar-foreground"
+              : "text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/80"
+          )}
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+        </Link>
+      )
+    }
+
     return (
       <div>
         <button
@@ -131,6 +145,23 @@ function NavItem({ item }: { item: MenuItem }) {
     )
   }
 
+  if (collapsed) {
+    return (
+      <Link
+        href={item.href}
+        title={item.label}
+        className={cn(
+          "flex h-9 w-9 items-center justify-center rounded-lg transition-colors",
+          isActive
+            ? "bg-sidebar-accent text-sidebar-foreground"
+            : "text-sidebar-foreground/50 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/80"
+        )}
+      >
+        <Icon className="h-4 w-4 shrink-0" />
+      </Link>
+    )
+  }
+
   return (
     <Link
       href={item.href}
@@ -147,51 +178,81 @@ function NavItem({ item }: { item: MenuItem }) {
   )
 }
 
-function Sidebar({ profile, onClose }: { profile: Profile; onClose?: () => void }) {
+function Sidebar({
+  profile,
+  collapsed,
+  onToggleCollapse,
+  onClose,
+}: {
+  profile: Profile
+  collapsed: boolean
+  onToggleCollapse: () => void
+  onClose?: () => void
+}) {
   const menuItems = getMenuItems(profile.role.kode)
 
   return (
     <div className="flex h-full flex-col bg-sidebar">
       {/* Logo */}
-      <div className="flex items-center justify-between border-b border-sidebar-border px-4 py-4">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-sidebar-accent ring-1 ring-sidebar-border">
-            <Building2 className="h-4 w-4 text-sidebar-foreground" />
+      <div className={cn(
+        "flex items-center border-b border-sidebar-border",
+        collapsed ? "justify-center px-0 py-4" : "justify-between px-4 py-4"
+      )}>
+        {!collapsed && (
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-accent ring-1 ring-sidebar-border">
+              <Building2 className="h-4 w-4 text-sidebar-foreground" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-sidebar-foreground truncate">BLU UIN Palopo</p>
+              <p className="text-[10px] text-sidebar-foreground/30">Penerimaan Dana</p>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-semibold text-sidebar-foreground">BLU UIN Palopo</p>
-            <p className="text-[10px] text-sidebar-foreground/30">Penerimaan Dana</p>
-          </div>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="text-sidebar-foreground/40 hover:text-sidebar-foreground lg:hidden">
-            <X className="h-4 w-4" />
-          </button>
         )}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onToggleCollapse}
+            title={collapsed ? "Perluas sidebar" : "Ciutkan sidebar"}
+            className="hidden lg:flex h-7 w-7 items-center justify-center rounded-md text-sidebar-foreground/40 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-colors"
+          >
+            <PanelLeft className={cn("h-4 w-4 transition-transform duration-200", collapsed && "rotate-180")} />
+          </button>
+          {onClose && (
+            <button onClick={onClose} className="text-sidebar-foreground/40 hover:text-sidebar-foreground lg:hidden">
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-3 py-3">
-        <div className="flex flex-col gap-0.5">
+      <nav className="flex-1 overflow-y-auto py-3 px-2">
+        <div className={cn("flex flex-col gap-0.5", collapsed && "items-center")}>
           {menuItems.map((item) => (
-            <NavItem key={item.href} item={item} />
+            <NavItem key={item.href} item={item} collapsed={collapsed} />
           ))}
         </div>
       </nav>
 
       {/* User info + logout */}
-      <div className="border-t border-sidebar-border p-3">
-        <div className="mb-2 rounded-lg bg-sidebar-accent px-3 py-2">
-          <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{profile.nama_lengkap}</p>
-          <p className="text-[10px] text-sidebar-foreground/30 truncate">{profile.role.nama}</p>
-        </div>
+      <div className="border-t border-sidebar-border p-2">
+        {!collapsed && (
+          <div className="mb-2 rounded-lg bg-sidebar-accent px-3 py-2">
+            <p className="text-xs font-medium text-sidebar-foreground/80 truncate">{profile.nama_lengkap}</p>
+            <p className="text-[10px] text-sidebar-foreground/30 truncate">{profile.role.nama}</p>
+          </div>
+        )}
         <form action={actionLogout}>
           <button
             type="submit"
-            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-sidebar-foreground/40 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground/70"
+            title="Keluar"
+            className={cn(
+              "flex w-full items-center rounded-lg text-xs text-sidebar-foreground/40 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground/70",
+              collapsed ? "h-9 justify-center" : "gap-2 px-3 py-2"
+            )}
           >
-            <LogOut className="h-3.5 w-3.5" />
-            Keluar
+            <LogOut className="h-3.5 w-3.5 shrink-0" />
+            {!collapsed && "Keluar"}
           </button>
         </form>
       </div>
@@ -207,12 +268,20 @@ export function AppShell({
   profile: Profile
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div className="flex h-screen bg-background text-foreground">
       {/* Sidebar desktop */}
-      <aside className="hidden w-56 shrink-0 lg:block">
-        <Sidebar profile={profile} />
+      <aside className={cn(
+        "hidden shrink-0 lg:block transition-all duration-200",
+        collapsed ? "w-14" : "w-64"
+      )}>
+        <Sidebar
+          profile={profile}
+          collapsed={collapsed}
+          onToggleCollapse={() => setCollapsed((v) => !v)}
+        />
       </aside>
 
       {/* Sidebar mobile overlay */}
@@ -222,8 +291,13 @@ export function AppShell({
             className="absolute inset-0 bg-black/60"
             onClick={() => setSidebarOpen(false)}
           />
-          <aside className="absolute left-0 top-0 h-full w-56 z-50">
-            <Sidebar profile={profile} onClose={() => setSidebarOpen(false)} />
+          <aside className="absolute left-0 top-0 h-full w-64 z-50">
+            <Sidebar
+              profile={profile}
+              collapsed={false}
+              onToggleCollapse={() => {}}
+              onClose={() => setSidebarOpen(false)}
+            />
           </aside>
         </div>
       )}

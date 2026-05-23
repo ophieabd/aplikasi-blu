@@ -1,0 +1,170 @@
+"use client"
+
+import { useState, useTransition } from "react"
+import Link from "next/link"
+import { format } from "date-fns"
+import { id } from "date-fns/locale"
+import { X, CheckCheck } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button"
+import { PenerimaanStatusBadge } from "@/components/penerimaan-status-badge"
+import { EmptyState } from "@/components/empty-state"
+import { toast } from "sonner"
+import { bulkVerifyPenerimaan } from "@/app/actions/penerimaan"
+
+const rupiah = (n: number) =>
+  new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(n)
+
+type Row = {
+  id: string
+  nomor_bukti: string
+  tanggal_terima: string
+  jumlah: number
+  status: string
+  jenis: unknown
+  unit: unknown
+}
+
+export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boolean }) {
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [pending, startTransition] = useTransition()
+
+  const draftIds = data.filter((r) => r.status === "draft").map((r) => r.id)
+  const allDraftSelected = draftIds.length > 0 && draftIds.every((id) => selected.has(id))
+
+  function toggleSelectAll() {
+    if (allDraftSelected) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(draftIds))
+    }
+  }
+
+  function toggleRow(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  function handleBulkVerify() {
+    startTransition(async () => {
+      const result = await bulkVerifyPenerimaan(Array.from(selected))
+      if (!result.ok) { toast.error(result.pesan); return }
+      const { berhasil, gagal } = result.data
+      if (gagal > 0) {
+        toast.warning(`${berhasil} terverifikasi, ${gagal} gagal`)
+      } else {
+        toast.success(`${berhasil} transaksi berhasil diverifikasi`)
+      }
+      setSelected(new Set())
+    })
+  }
+
+  if (data.length === 0) return <EmptyState message="Belum ada transaksi penerimaan" />
+
+  return (
+    <div className="flex flex-col gap-3">
+      <Card className="overflow-hidden p-0">
+        <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border hover:bg-transparent">
+              {isAdmin && (
+                <TableHead className="w-10 pl-4">
+                  <Checkbox
+                    checked={allDraftSelected}
+                    onCheckedChange={toggleSelectAll}
+                    disabled={draftIds.length === 0}
+                    className="border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                  />
+                </TableHead>
+              )}
+              <TableHead className="text-muted-foreground text-xs">Nomor Bukti</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Tanggal</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Jenis</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Unit</TableHead>
+              <TableHead className="text-muted-foreground text-xs text-right">Jumlah</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((row) => {
+              const isDraft = row.status === "draft"
+              const isChecked = selected.has(row.id)
+              return (
+                <TableRow
+                  key={row.id}
+                  className={`border-border/50 hover:bg-muted/20 cursor-pointer ${isChecked ? "bg-muted/40" : ""}`}
+                >
+                  {isAdmin && (
+                    <TableCell className="pl-4 py-3 w-10">
+                      {isDraft && (
+                        <Checkbox
+                          checked={isChecked}
+                          onCheckedChange={() => toggleRow(row.id)}
+                          className="border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
+                        />
+                      )}
+                    </TableCell>
+                  )}
+                  <TableCell className="py-3">
+                    <Link href={`/penerimaan/${row.id}`} className="text-sm font-mono text-primary hover:underline">
+                      {row.nomor_bukti}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground/60 py-3">
+                    {format(new Date(row.tanggal_terima), "dd MMM yyyy", { locale: id })}
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground/70 py-3">
+                    {(row.jenis as { nama?: string } | null)?.nama ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground/50 py-3">
+                    {(row.unit as { kode?: string } | null)?.kode ?? "—"}
+                  </TableCell>
+                  <TableCell className="text-sm text-foreground/80 py-3 text-right font-medium">
+                    {rupiah(row.jumlah)}
+                  </TableCell>
+                  <TableCell className="py-3">
+                    <PenerimaanStatusBadge status={row.status as "draft" | "verified" | "void"} />
+                  </TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+        </CardContent>
+      </Card>
+
+      {/* Floating bulk action bar */}
+      {selected.size > 0 && (
+        <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-border bg-background/95 backdrop-blur px-4 py-3 shadow-xl">
+          <span className="text-sm text-foreground/60 flex-1">
+            {selected.size} transaksi dipilih
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelected(new Set())}
+            className="text-muted-foreground hover:text-foreground gap-1.5"
+          >
+            <X className="h-3.5 w-3.5" />
+            Batalkan
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleBulkVerify}
+            disabled={pending}
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
+          >
+            <CheckCheck className="h-3.5 w-3.5" />
+            {pending ? "Memverifikasi..." : `Verifikasi (${selected.size})`}
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+}

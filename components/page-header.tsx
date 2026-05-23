@@ -12,9 +12,9 @@ export function PageHeader({
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
-        <h1 className="text-lg font-semibold text-white/90">{title}</h1>
+        <h1 className="text-lg font-semibold text-foreground">{title}</h1>
         {description && (
-          <p className="mt-0.5 text-sm text-white/40">{description}</p>
+          <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

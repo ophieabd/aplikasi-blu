@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { MasterTable, type MasterRow } from "@/components/master-table"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -42,20 +42,20 @@ function UnitForm({ row, onDone }: { row: Row | null; onDone: () => void }) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Kode</Label>
-        <Input {...register("kode")} placeholder="UK-01" className="bg-white/5 border-white/10 text-white" />
-        {errors.kode && <p className="text-xs text-red-400">{errors.kode.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nama</Label>
-        <Input {...register("nama")} placeholder="Nama unit kerja" className="bg-white/5 border-white/10 text-white" />
-        {errors.nama && <p className="text-xs text-red-400">{errors.nama.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Keterangan</Label>
-        <Textarea {...register("keterangan")} rows={2} placeholder="Opsional" className="bg-white/5 border-white/10 text-white resize-none" />
-      </div>
+      <Field data-invalid={!!errors.kode}>
+        <FieldLabel>Kode</FieldLabel>
+        <Input {...register("kode")} placeholder="UK-01" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.kode} />
+        <FieldError errors={[errors.kode]} />
+      </Field>
+      <Field data-invalid={!!errors.nama}>
+        <FieldLabel>Nama</FieldLabel>
+        <Input {...register("nama")} placeholder="Nama unit kerja" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.nama} />
+        <FieldError errors={[errors.nama]} />
+      </Field>
+      <Field>
+        <FieldLabel>Keterangan</FieldLabel>
+        <Textarea {...register("keterangan")} rows={2} placeholder="Opsional" className="bg-muted/50 border-border text-foreground resize-none" />
+      </Field>
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Menyimpan..." : "Simpan"}
       </Button>

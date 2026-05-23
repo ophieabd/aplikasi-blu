@@ -9,6 +9,8 @@ import { ChevronLeft } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { CurrencyInput } from "@/components/currency-input"
 import { toast } from "sonner"
 import { createPenerimaan, updatePenerimaan, type PenerimaanInput } from "@/app/actions/penerimaan"
@@ -38,24 +40,10 @@ type Props = {
   lockedUnitId?: string
 }
 
-const inputCls = "bg-white/5 border-white/10 text-white/90 placeholder:text-white/20 focus-visible:border-white/30 focus-visible:ring-white/10"
+const inputCls = "bg-muted/50 border-border text-foreground placeholder:text-muted-foreground/50 focus-visible:border-ring focus-visible:ring-ring/20"
 
-function Field({ label, required, error, children }: {
-  label: string
-  required?: boolean
-  error?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="flex flex-col gap-2">
-      <p className="text-xs font-medium text-white/50 uppercase tracking-wide">
-        {label}
-        {required && <span className="ml-1 text-red-400">*</span>}
-      </p>
-      {children}
-      {error && <p className="text-xs text-red-400">{error}</p>}
-    </div>
-  )
+function Req() {
+  return <span className="ml-1 text-destructive">*</span>
 }
 
 export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
@@ -149,9 +137,9 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
     })
   }
 
-  const sectionCls = "rounded-xl border border-white/10 overflow-hidden"
-  const sectionHeadCls = "px-5 py-3.5 border-b border-white/10"
-  const sectionTitleCls = "text-sm font-medium text-white/60"
+  const sectionCls = "rounded-xl border border-border overflow-hidden"
+  const sectionHeadCls = "px-5 py-3.5 border-b border-border"
+  const sectionTitleCls = "text-sm font-medium text-foreground/60"
   const sectionBodyCls = "p-5 flex flex-col gap-5"
   const triggerCls = `w-full ${inputCls}`
 
@@ -161,35 +149,29 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-sm"
             onClick={() => router.back()}
-            className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-white/40 hover:bg-white/5 hover:text-white/70 transition-colors"
+            className="mt-0.5 shrink-0"
           >
             <ChevronLeft className="h-4 w-4" />
-          </button>
+          </Button>
           <div>
-            <h1 className="text-lg font-semibold text-white/90">
+            <h1 className="text-lg font-semibold text-foreground">
               {editId ? "Edit Penerimaan" : "Input Penerimaan"}
             </h1>
-            <p className="mt-0.5 text-sm text-white/40">Catat penerimaan dana baru sebagai draft</p>
+            <p className="mt-0.5 text-sm text-muted-foreground">Catat penerimaan dana baru sebagai draft</p>
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="rounded-md px-3 py-1.5 text-sm font-medium text-white/50 hover:bg-white/5 hover:text-white/70 transition-colors"
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={() => router.back()}>
             Batal
-          </button>
-          <button
-            type="submit"
-            disabled={pending}
-            className="inline-flex items-center rounded-md bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-white/90 disabled:opacity-50 transition-colors"
-          >
+          </Button>
+          <Button type="submit" size="sm" disabled={pending}>
             {pending ? "Menyimpan..." : editId ? "Perbarui" : "Simpan sebagai Draft"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -204,10 +186,13 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
               <p className={sectionTitleCls}>Informasi Transaksi</p>
             </div>
             <div className={sectionBodyCls}>
-              <Field label="Tanggal Transaksi" required error={errors.tanggal_terima?.message}>
+              <Field data-invalid={!!errors.tanggal_terima}>
+                <FieldLabel>Tanggal Transaksi<Req /></FieldLabel>
                 <Input {...register("tanggal_terima")} type="date" className={inputCls} aria-invalid={!!errors.tanggal_terima} />
+                <FieldError errors={[errors.tanggal_terima]} />
               </Field>
-              <Field label="Kategori Pendapatan" required error={errors.kategori_id?.message}>
+              <Field data-invalid={!!errors.kategori_id}>
+                <FieldLabel>Kategori Pendapatan<Req /></FieldLabel>
                 <Controller name="kategori_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <SelectTrigger className={triggerCls} aria-invalid={!!errors.kategori_id}>
@@ -216,6 +201,7 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
                     <SelectContent>{kategoriList.map(k => <SelectItem key={k.id} value={k.id}>{k.kode} — {k.nama}</SelectItem>)}</SelectContent>
                   </Select>
                 )} />
+                <FieldError errors={[errors.kategori_id]} />
               </Field>
             </div>
           </div>
@@ -225,7 +211,8 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
               <p className={sectionTitleCls}>Klasifikasi Pendapatan</p>
             </div>
             <div className={sectionBodyCls}>
-              <Field label="Jenis Pendapatan" required error={errors.jenis_pendapatan_id?.message}>
+              <Field data-invalid={!!errors.jenis_pendapatan_id}>
+                <FieldLabel>Jenis Pendapatan<Req /></FieldLabel>
                 <Controller name="jenis_pendapatan_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchKategori}>
                     <SelectTrigger className={triggerCls} aria-invalid={!!errors.jenis_pendapatan_id}>
@@ -234,8 +221,10 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
                     <SelectContent>{jenisList.map(j => <SelectItem key={j.id} value={j.id}>{j.kode} — {j.nama}</SelectItem>)}</SelectContent>
                   </Select>
                 )} />
+                <FieldError errors={[errors.jenis_pendapatan_id]} />
               </Field>
-              <Field label="Sub Pendapatan">
+              <Field>
+                <FieldLabel>Sub Pendapatan</FieldLabel>
                 <Controller name="sub_pendapatan_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!watchJenis || subList.length === 0}>
                     <SelectTrigger className={triggerCls}>
@@ -258,12 +247,15 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
               <p className={sectionTitleCls}>Pembayaran</p>
             </div>
             <div className={sectionBodyCls}>
-              <Field label="Jumlah" required error={errors.jumlah?.message}>
+              <Field data-invalid={!!errors.jumlah}>
+                <FieldLabel>Jumlah<Req /></FieldLabel>
                 <Controller name="jumlah" control={control} render={({ field }) => (
                   <CurrencyInput value={field.value} onChange={field.onChange} className={inputCls} aria-invalid={!!errors.jumlah} />
                 )} />
+                <FieldError errors={[errors.jumlah]} />
               </Field>
-              <Field label="Metode Pembayaran" required error={errors.jenis_pemindahan_kas_id?.message}>
+              <Field data-invalid={!!errors.jenis_pemindahan_kas_id}>
+                <FieldLabel>Metode Pembayaran<Req /></FieldLabel>
                 <Controller name="jenis_pemindahan_kas_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <SelectTrigger className={triggerCls} aria-invalid={!!errors.jenis_pemindahan_kas_id}>
@@ -272,6 +264,7 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
                     <SelectContent>{metodeList.map(m => <SelectItem key={m.id} value={m.id}>{m.nama}</SelectItem>)}</SelectContent>
                   </Select>
                 )} />
+                <FieldError errors={[errors.jenis_pemindahan_kas_id]} />
               </Field>
             </div>
           </div>
@@ -281,7 +274,8 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
               <p className={sectionTitleCls}>Unit & Rekening</p>
             </div>
             <div className={sectionBodyCls}>
-              <Field label="Unit Kerja" required error={errors.unit_kerja_id?.message}>
+              <Field data-invalid={!!errors.unit_kerja_id}>
+                <FieldLabel>Unit Kerja<Req /></FieldLabel>
                 <Controller name="unit_kerja_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""} disabled={!!lockedUnitId}>
                     <SelectTrigger className={triggerCls} aria-invalid={!!errors.unit_kerja_id}>
@@ -290,8 +284,10 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
                     <SelectContent>{unitList.map(u => <SelectItem key={u.id} value={u.id}>{u.kode} — {u.nama}</SelectItem>)}</SelectContent>
                   </Select>
                 )} />
+                <FieldError errors={[errors.unit_kerja_id]} />
               </Field>
-              <Field label="Rekening Bank" required error={errors.rekening_bank_id?.message}>
+              <Field data-invalid={!!errors.rekening_bank_id}>
+                <FieldLabel>Rekening Bank<Req /></FieldLabel>
                 <Controller name="rekening_bank_id" control={control} render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value ?? ""}>
                     <SelectTrigger className={triggerCls} aria-invalid={!!errors.rekening_bank_id}>
@@ -300,6 +296,7 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
                     <SelectContent>{rekeningList.map(r => <SelectItem key={r.id} value={r.id}>{r.kode} — {r.nama}</SelectItem>)}</SelectContent>
                   </Select>
                 )} />
+                <FieldError errors={[errors.rekening_bank_id]} />
               </Field>
             </div>
           </div>
@@ -309,10 +306,12 @@ export function PenerimaanForm({ editId, defaultValues, lockedUnitId }: Props) {
               <p className={sectionTitleCls}>Referensi</p>
             </div>
             <div className={sectionBodyCls}>
-              <Field label="Nomor Bukti">
+              <Field>
+                <FieldLabel>Nomor Bukti</FieldLabel>
                 <Input {...register("nomor_referensi")} placeholder="No. bukti / referensi transaksi" className={inputCls} />
               </Field>
-              <Field label="Uraian">
+              <Field>
+                <FieldLabel>Uraian</FieldLabel>
                 <Textarea {...register("uraian")} rows={3} placeholder="Keterangan tambahan (opsional)" className={`${inputCls} resize-none`} />
               </Field>
             </div>

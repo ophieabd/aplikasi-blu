@@ -65,28 +65,28 @@ function InviteForm({ roles, unitKerja, onDone }: { roles: Role[]; unitKerja: Un
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Email</Label>
-          <Input {...register("email")} type="email" placeholder="nama@uinpalopo.ac.id" className="bg-white/5 border-white/10 text-white" />
+          <Label className="text-foreground/60 text-xs">Email</Label>
+          <Input {...register("email")} type="email" placeholder="nama@uinpalopo.ac.id" className="bg-muted/50 border-border text-foreground" />
           {errors.email && <p className="text-xs text-red-400">{errors.email.message}</p>}
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Password Awal</Label>
-          <Input {...register("password")} type="password" placeholder="Min. 6 karakter" className="bg-white/5 border-white/10 text-white" />
+          <Label className="text-foreground/60 text-xs">Password Awal</Label>
+          <Input {...register("password")} type="password" placeholder="Min. 6 karakter" className="bg-muted/50 border-border text-foreground" />
           {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nama Lengkap</Label>
-        <Input {...register("nama_lengkap")} placeholder="Nama lengkap" className="bg-white/5 border-white/10 text-white" />
+        <Label className="text-foreground/60 text-xs">Nama Lengkap</Label>
+        <Input {...register("nama_lengkap")} placeholder="Nama lengkap" className="bg-muted/50 border-border text-foreground" />
         {errors.nama_lengkap && <p className="text-xs text-red-400">{errors.nama_lengkap.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Role</Label>
+          <Label className="text-foreground/60 text-xs">Role</Label>
           <Controller name="role_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="Pilih role" /></SelectTrigger>
-              <SelectContent className="border-white/10">
+              <SelectTrigger className="bg-muted/50 border-border text-foreground"><SelectValue placeholder="Pilih role" /></SelectTrigger>
+              <SelectContent className="border-border">
                 {roles.map((r) => <SelectItem key={r.id} value={r.id}>{r.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -94,11 +94,11 @@ function InviteForm({ roles, unitKerja, onDone }: { roles: Role[]; unitKerja: Un
           {errors.role_id && <p className="text-xs text-red-400">Wajib dipilih</p>}
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Unit Kerja (opsional)</Label>
+          <Label className="text-foreground/60 text-xs">Unit Kerja (opsional)</Label>
           <Controller name="unit_kerja_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="— Semua unit —" /></SelectTrigger>
-              <SelectContent className="border-white/10">
+              <SelectTrigger className="bg-muted/50 border-border text-foreground"><SelectValue placeholder="— Semua unit —" /></SelectTrigger>
+              <SelectContent className="border-border">
                 {unitKerja.map((u) => <SelectItem key={u.id} value={u.id}>{u.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -106,8 +106,8 @@ function InviteForm({ roles, unitKerja, onDone }: { roles: Role[]; unitKerja: Un
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">No HP (opsional)</Label>
-        <Input {...register("no_hp")} placeholder="08xx" className="bg-white/5 border-white/10 text-white" />
+        <Label className="text-foreground/60 text-xs">No HP (opsional)</Label>
+        <Input {...register("no_hp")} placeholder="08xx" className="bg-muted/50 border-border text-foreground" />
       </div>
       <Button type="submit" disabled={pending} className="w-full mt-1">
         {pending ? "Menyimpan..." : "Tambah Pengguna"}
@@ -141,28 +141,28 @@ function EditForm({ row, roles, unitKerja, onDone }: { row: Pengguna; roles: Rol
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nama Lengkap</Label>
-        <Input {...register("nama_lengkap")} className="bg-white/5 border-white/10 text-white" />
+        <Label className="text-foreground/60 text-xs">Nama Lengkap</Label>
+        <Input {...register("nama_lengkap")} className="bg-muted/50 border-border text-foreground" />
         {errors.nama_lengkap && <p className="text-xs text-red-400">{errors.nama_lengkap.message}</p>}
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Role</Label>
+          <Label className="text-foreground/60 text-xs">Role</Label>
           <Controller name="role_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue /></SelectTrigger>
-              <SelectContent className="border-white/10">
+              <SelectTrigger className="bg-muted/50 border-border text-foreground"><SelectValue /></SelectTrigger>
+              <SelectContent className="border-border">
                 {roles.map((r) => <SelectItem key={r.id} value={r.id}>{r.nama}</SelectItem>)}
               </SelectContent>
             </Select>
           )} />
         </div>
         <div className="flex flex-col gap-1.5">
-          <Label className="text-white/60 text-xs">Unit Kerja</Label>
+          <Label className="text-foreground/60 text-xs">Unit Kerja</Label>
           <Controller name="unit_kerja_id" control={control} render={({ field }) => (
             <Select onValueChange={field.onChange} value={field.value}>
-              <SelectTrigger className="bg-white/5 border-white/10 text-white"><SelectValue placeholder="— Semua —" /></SelectTrigger>
-              <SelectContent className="border-white/10">
+              <SelectTrigger className="bg-muted/50 border-border text-foreground"><SelectValue placeholder="— Semua —" /></SelectTrigger>
+              <SelectContent className="border-border">
                 {unitKerja.map((u) => <SelectItem key={u.id} value={u.id}>{u.nama}</SelectItem>)}
               </SelectContent>
             </Select>
@@ -170,14 +170,14 @@ function EditForm({ row, roles, unitKerja, onDone }: { row: Pengguna; roles: Rol
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">No HP</Label>
-        <Input {...register("no_hp")} className="bg-white/5 border-white/10 text-white" />
+        <Label className="text-foreground/60 text-xs">No HP</Label>
+        <Input {...register("no_hp")} className="bg-muted/50 border-border text-foreground" />
       </div>
       <div className="flex items-center gap-2">
         <Controller name="is_active" control={control} render={({ field }) => (
           <Checkbox id="is_active" checked={field.value} onCheckedChange={field.onChange} />
         )} />
-        <Label htmlFor="is_active" className="text-xs text-white/60">Akun aktif</Label>
+        <Label htmlFor="is_active" className="text-xs text-foreground/60">Akun aktif</Label>
       </div>
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Menyimpan..." : "Simpan"}
@@ -202,8 +202,8 @@ function ResetPwForm({ id, onDone }: { id: string; onDone: () => void }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Password Baru</Label>
-        <Input {...register("password")} type="password" placeholder="Min. 6 karakter" className="bg-white/5 border-white/10 text-white" />
+        <Label className="text-foreground/60 text-xs">Password Baru</Label>
+        <Input {...register("password")} type="password" placeholder="Min. 6 karakter" className="bg-muted/50 border-border text-foreground" />
         {errors.password && <p className="text-xs text-red-400">{errors.password.message}</p>}
       </div>
       <Button type="submit" disabled={pending} className="w-full">
@@ -234,34 +234,34 @@ export function PenggunaTable({ data, roles, unitKerja }: { data: Pengguna[]; ro
       {data.length === 0 ? (
         <EmptyState message="Belum ada pengguna" />
       ) : (
-        <div className="rounded-xl border border-white/10 overflow-hidden">
+        <div className="rounded-xl border border-border overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-white/40 text-xs">Nama</TableHead>
-                <TableHead className="text-white/40 text-xs">Email</TableHead>
-                <TableHead className="text-white/40 text-xs">Role</TableHead>
-                <TableHead className="text-white/40 text-xs">Unit Kerja</TableHead>
-                <TableHead className="text-white/40 text-xs">Status</TableHead>
-                <TableHead className="text-white/40 text-xs text-right">Aksi</TableHead>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground text-xs">Nama</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Email</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Role</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Unit Kerja</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Status</TableHead>
+                <TableHead className="text-muted-foreground text-xs text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((row) => (
-                <TableRow key={row.id} className="border-white/5 hover:bg-white/[0.02]">
-                  <TableCell className="text-sm text-white/80 py-3 font-medium">{row.nama_lengkap}</TableCell>
-                  <TableCell className="text-sm text-white/50 py-3">{row.email ?? "—"}</TableCell>
-                  <TableCell className="text-sm text-white/60 py-3">{row.role?.nama ?? "—"}</TableCell>
-                  <TableCell className="text-sm text-white/50 py-3">{row.unit_kerja?.nama ?? "—"}</TableCell>
+                <TableRow key={row.id} className="border-border/50 hover:bg-muted/20">
+                  <TableCell className="text-sm text-foreground/80 py-3 font-medium">{row.nama_lengkap}</TableCell>
+                  <TableCell className="text-sm text-foreground/50 py-3">{row.email ?? "—"}</TableCell>
+                  <TableCell className="text-sm text-foreground/60 py-3">{row.role?.nama ?? "—"}</TableCell>
+                  <TableCell className="text-sm text-foreground/50 py-3">{row.unit_kerja?.nama ?? "—"}</TableCell>
                   <TableCell className="py-3"><StatusBadge aktif={row.is_active} /></TableCell>
                   <TableCell className="py-3">
                     <div className="flex justify-end gap-1">
                       <Button variant="ghost" size="sm" onClick={() => setModal({ type: "edit", row })}
-                        className="h-7 w-7 p-0 text-white/40 hover:text-white">
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                       <Button variant="ghost" size="sm" onClick={() => setModal({ type: "reset_pw", row })}
-                        className="h-7 w-7 p-0 text-white/40 hover:text-white">
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground">
                         <KeyRound className="h-3.5 w-3.5" />
                       </Button>
                     </div>

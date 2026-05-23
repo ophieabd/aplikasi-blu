@@ -99,3 +99,27 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **Guidelines berhasil jika:** diff lebih bersih, lebih sedikit rewrite karena overcomplication, pertanyaan klarifikasi datang sebelum implementasi bukan setelah kesalahan.
+
+## 5. Shadcn Component Rule
+
+**Selalu cek MCP shadcn sebelum implement komponen UI apapun.**
+
+- Gunakan `mcp__shadcn__get_item_examples_from_registries` untuk kode contoh exact
+- Gunakan `mcp__shadcn__view_items_in_registries` untuk struktur & props komponen
+- Gunakan `mcp__shadcn__search_items_in_registries` untuk cari komponen tersedia
+
+Jangan tebak API shadcn dari training data — selalu fetch registry live.
+
+**Kenapa:** shadcn sering update API. Contoh breaking change yang sudah terjadi di proyek ini:
+- `asChild` → `render` prop (Base UI)
+- `hsl(var(--chart-N))` → `var(--chart-N)` untuk oklch color space (Tailwind v4)
+- Tooltip manual recharts → `ChartTooltipContent` shadcn
+
+**Warna CSS variables:** proyek pakai oklch (Tailwind v4). Jangan wrap dengan `hsl()`.
+Gunakan: `color: "var(--chart-1)"` bukan `color: "hsl(var(--chart-1))"`.
+
+**Semantic tokens wajib:** selalu pakai token semantik, jangan hardcode warna.
+- `text-foreground` bukan `text-white` / `text-black`
+- `border-border` bukan `border-white/10`
+- `bg-muted` bukan `bg-zinc-800`
+- `bg-primary text-primary-foreground` bukan `bg-white text-zinc-900`

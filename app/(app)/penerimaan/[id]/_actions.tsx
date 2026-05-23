@@ -57,7 +57,7 @@ export function PenerimaanActions({ id, status, isAdmin, canEdit, isOwner }: Pro
       {canEdit && (
         <Link
           href={`/penerimaan/${id}/edit`}
-          className="inline-flex items-center rounded-md border border-white/10 px-3 py-1.5 text-sm text-white/70 hover:bg-white/5 transition-colors"
+          className="inline-flex items-center rounded-md border border-border px-3 py-1.5 text-sm text-foreground/70 hover:bg-muted/50 transition-colors"
         >
           Edit
         </Link>
@@ -92,13 +92,13 @@ export function PenerimaanActions({ id, status, isAdmin, canEdit, isOwner }: Pro
           </DialogHeader>
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
-              <Label className="text-white/60 text-xs">Alasan Pembatalan <span className="text-red-400">*</span></Label>
+              <Label className="text-foreground/60 text-xs">Alasan Pembatalan <span className="text-red-400">*</span></Label>
               <Textarea
                 value={alasan}
                 onChange={(e) => setAlasan(e.target.value)}
                 rows={3}
                 placeholder="Jelaskan alasan pembatalan..."
-                className="bg-white/5 border-white/10 text-white resize-none"
+                className="bg-muted/50 border-border text-foreground resize-none"
               />
             </div>
             <Button onClick={handleVoid} disabled={pending || !alasan.trim()}

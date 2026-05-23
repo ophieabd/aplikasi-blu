@@ -30,13 +30,13 @@ export default async function PenerimaanDetailPage({ params }: { params: Promise
   return (
     <div className="flex flex-col gap-6 max-w-2xl">
       <div className="flex items-center gap-3">
-        <Link href="/penerimaan" className="text-white/40 hover:text-white/70 transition-colors">
+        <Link href="/penerimaan" className="text-muted-foreground hover:text-foreground/70 transition-colors">
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <PageHeader title={data.nomor_bukti} />
       </div>
 
-      <div className="rounded-xl border border-white/10 divide-y divide-white/5">
+      <div className="rounded-xl border border-border divide-y divide-border/50">
         <Row label="Status">
           <PenerimaanStatusBadge status={data.status as "draft" | "verified" | "void"} />
         </Row>
@@ -60,7 +60,7 @@ export default async function PenerimaanDetailPage({ params }: { params: Promise
           {(data.metode as { nama?: string } | null)?.nama ?? "—"}
         </Row>
         <Row label="Jumlah">
-          <span className="text-white font-semibold">{rupiah(data.jumlah)}</span>
+          <span className="text-foreground font-semibold">{rupiah(data.jumlah)}</span>
         </Row>
         <Row label="Nomor Bukti">{data.nomor_referensi ?? "—"}</Row>
         <Row label="Uraian">{data.uraian ?? "—"}</Row>
@@ -97,8 +97,8 @@ export default async function PenerimaanDetailPage({ params }: { params: Promise
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 px-4 py-3">
-      <span className="text-xs text-white/40 w-40 shrink-0">{label}</span>
-      <span className="text-sm text-white/70 text-right">{children}</span>
+      <span className="text-xs text-muted-foreground w-40 shrink-0">{label}</span>
+      <span className="text-sm text-foreground/70 text-right">{children}</span>
     </div>
   )
 }

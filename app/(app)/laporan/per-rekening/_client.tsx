@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import * as XLSX from "xlsx"
 import { Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +21,8 @@ export function LaporanRekeningClient({ tglAwal, tglAkhir, byRekening, total }: 
     router.push(`/laporan/per-rekening?tgl_awal=${awal}&tgl_akhir=${akhir}`)
   }
 
-  function exportExcel() {
+  async function exportExcel() {
+    const XLSX = await import("xlsx")
     const data = byRekening.map((r) => ({
       "Kode": r.kode,
       "Nama Bank": r.nama_bank,
@@ -42,21 +42,21 @@ export function LaporanRekeningClient({ tglAwal, tglAkhir, byRekening, total }: 
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-3">
           <div className="flex flex-col gap-1">
-            <Label className="text-xs text-white/40">Dari</Label>
+            <Label className="text-xs text-muted-foreground">Dari</Label>
             <Input type="date" value={tglAwal} onChange={(e) => navigate(e.target.value, tglAkhir)}
-              className="w-40 bg-white/5 border-white/10 text-white" />
+              className="w-40 bg-muted/50 border-border text-foreground" />
           </div>
           <div className="flex flex-col gap-1">
-            <Label className="text-xs text-white/40">Sampai</Label>
+            <Label className="text-xs text-muted-foreground">Sampai</Label>
             <Input type="date" value={tglAkhir} onChange={(e) => navigate(tglAwal, e.target.value)}
-              className="w-40 bg-white/5 border-white/10 text-white" />
+              className="w-40 bg-muted/50 border-border text-foreground" />
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Download className="h-4 w-4" />Excel
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Printer className="h-4 w-4" />PDF
           </Button>
         </div>
@@ -67,17 +67,17 @@ export function LaporanRekeningClient({ tglAwal, tglAkhir, byRekening, total }: 
       ) : (
         <div className="flex flex-col gap-2">
           {byRekening.map((r) => (
-            <div key={r.kode} className="rounded-xl border border-white/10 px-5 py-4 flex items-center justify-between">
+            <div key={r.kode} className="rounded-xl border border-border px-5 py-4 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-white/80">{r.nama_bank}</p>
-                <p className="text-xs text-white/40">{r.nama_rekening} — {r.nomor_rekening}</p>
+                <p className="text-sm font-medium text-foreground/80">{r.nama_bank}</p>
+                <p className="text-xs text-muted-foreground">{r.nama_rekening} — {r.nomor_rekening}</p>
               </div>
-              <span className="text-sm font-bold text-white">{rupiah(r.total)}</span>
+              <span className="text-sm font-bold text-foreground">{rupiah(r.total)}</span>
             </div>
           ))}
-          <div className="flex items-center justify-between rounded-xl bg-white/10 px-5 py-4">
-            <span className="text-sm font-semibold text-white/80">TOTAL</span>
-            <span className="text-base font-bold text-white">{rupiah(total)}</span>
+          <div className="flex items-center justify-between rounded-xl bg-muted px-5 py-4">
+            <span className="text-sm font-semibold text-foreground/80">TOTAL</span>
+            <span className="text-base font-bold text-foreground">{rupiah(total)}</span>
           </div>
         </div>
       )}

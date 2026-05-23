@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import * as XLSX from "xlsx"
 import { Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -27,7 +26,8 @@ export function LaporanHarianClient({ tanggal, rows, total }: { tanggal: string;
     router.push(`/laporan/harian?tanggal=${e.target.value}`)
   }
 
-  function exportExcel() {
+  async function exportExcel() {
+    const XLSX = await import("xlsx")
     const data = rows.map((r) => ({
       "Nomor Bukti": r.nomor_bukti,
       "Jenis": r.jenis?.nama ?? "—",
@@ -52,13 +52,13 @@ export function LaporanHarianClient({ tanggal, rows, total }: { tanggal: string;
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <Input
           type="date" value={tanggal} onChange={handleTanggal}
-          className="w-44 bg-white/5 border-white/10 text-white"
+          className="w-44 bg-muted/50 border-border text-foreground"
         />
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Download className="h-4 w-4" />Excel
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Printer className="h-4 w-4" />PDF
           </Button>
         </div>
@@ -73,34 +73,34 @@ export function LaporanHarianClient({ tanggal, rows, total }: { tanggal: string;
         {rows.length === 0 ? (
           <EmptyState message={`Tidak ada penerimaan pada ${tglLabel}`} />
         ) : (
-          <div className="rounded-xl border border-white/10 overflow-hidden print:border-gray-300">
+          <div className="rounded-xl border border-border overflow-hidden print:border-gray-300">
             <Table>
               <TableHeader>
-                <TableRow className="border-white/10 hover:bg-transparent print:border-gray-200">
-                  <TableHead className="text-white/40 text-xs print:text-gray-500">No. Bukti</TableHead>
-                  <TableHead className="text-white/40 text-xs print:text-gray-500">Jenis</TableHead>
-                  <TableHead className="text-white/40 text-xs print:text-gray-500">Unit</TableHead>
-                  <TableHead className="text-white/40 text-xs print:text-gray-500">Metode</TableHead>
-                  <TableHead className="text-white/40 text-xs print:text-gray-500 text-right">Jumlah</TableHead>
-                  <TableHead className="text-white/40 text-xs print:text-gray-500 print:hidden">Status</TableHead>
+                <TableRow className="border-border hover:bg-transparent print:border-gray-200">
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500">No. Bukti</TableHead>
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500">Jenis</TableHead>
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500">Unit</TableHead>
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500">Metode</TableHead>
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500 text-right">Jumlah</TableHead>
+                  <TableHead className="text-muted-foreground text-xs print:text-gray-500 print:hidden">Status</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((r) => (
-                  <TableRow key={r.nomor_bukti} className="border-white/5 print:border-gray-100">
-                    <TableCell className="text-xs font-mono text-white/70 py-2 print:text-gray-700">{r.nomor_bukti}</TableCell>
-                    <TableCell className="text-xs text-white/70 py-2 print:text-gray-700">{r.jenis?.nama ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-white/50 py-2 print:text-gray-600">{r.unit?.kode ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-white/50 py-2 print:text-gray-600">{r.metode?.nama ?? "—"}</TableCell>
-                    <TableCell className="text-xs text-white/80 py-2 text-right font-medium print:text-gray-800">{rupiah(r.jumlah)}</TableCell>
+                  <TableRow key={r.nomor_bukti} className="border-border/50 print:border-gray-100">
+                    <TableCell className="text-xs font-mono text-foreground/70 py-2 print:text-gray-700">{r.nomor_bukti}</TableCell>
+                    <TableCell className="text-xs text-foreground/70 py-2 print:text-gray-700">{r.jenis?.nama ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-foreground/50 py-2 print:text-gray-600">{r.unit?.kode ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-foreground/50 py-2 print:text-gray-600">{r.metode?.nama ?? "—"}</TableCell>
+                    <TableCell className="text-xs text-foreground/80 py-2 text-right font-medium print:text-gray-800">{rupiah(r.jumlah)}</TableCell>
                     <TableCell className="text-xs py-2 print:hidden">
                       <PenerimaanStatusBadge status={r.status as "draft" | "verified" | "void"} />
                     </TableCell>
                   </TableRow>
                 ))}
-                <TableRow className="border-t-2 border-white/20 font-semibold print:border-gray-400">
-                  <TableCell colSpan={4} className="text-xs text-white/60 py-2 print:text-gray-700">TOTAL</TableCell>
-                  <TableCell className="text-sm text-white font-bold py-2 text-right print:text-gray-900">{rupiah(total)}</TableCell>
+                <TableRow className="border-t-2 border-border font-semibold print:border-gray-400">
+                  <TableCell colSpan={4} className="text-xs text-foreground/60 py-2 print:text-gray-700">TOTAL</TableCell>
+                  <TableCell className="text-sm text-foreground font-bold py-2 text-right print:text-gray-900">{rupiah(total)}</TableCell>
                   <TableCell className="print:hidden" />
                 </TableRow>
               </TableBody>

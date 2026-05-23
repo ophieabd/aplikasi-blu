@@ -6,6 +6,8 @@ import { Banknote, Clock, TrendingUp, ArrowRight, Plus } from "lucide-react"
 import { getDashboardStats } from "@/app/actions/dashboard"
 import { PenerimaanStatusBadge } from "@/components/penerimaan-status-badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardHeader, CardContent, CardAction, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { DashboardChart } from "./_chart"
 
 const rupiah = (n: number) =>
@@ -24,10 +26,10 @@ export default async function DashboardPage() {
 
       {/* Header */}
       <div>
-        <h1 className="text-lg font-semibold text-white/90">
+        <h1 className="text-lg font-semibold text-foreground">
           Selamat datang, {stats.nama}
         </h1>
-        <p className="mt-0.5 text-sm text-white/40">
+        <p className="mt-0.5 text-sm text-muted-foreground">
           {stats.role === "ADMIN" ? "Administrator"
             : stats.role === "PIMPINAN" ? "Pimpinan"
             : `Operator${stats.unitNama ? ` — ${stats.unitNama}` : ""}`}
@@ -64,13 +66,10 @@ export default async function DashboardPage() {
       {/* Quick actions (operator) */}
       {isOperator && (
         <div className="flex gap-3">
-          <Link
-            href="/penerimaan/baru"
-            className="inline-flex items-center gap-1.5 rounded-md bg-white px-3 py-1.5 text-sm font-medium text-zinc-900 hover:bg-white/90 transition-colors"
-          >
+          <Button size="sm" render={<Link href="/penerimaan/baru" />}>
             <Plus className="h-4 w-4" />
             Input Penerimaan
-          </Link>
+          </Button>
         </div>
       )}
 
@@ -80,59 +79,63 @@ export default async function DashboardPage() {
       )}
 
       {/* Transaksi terbaru */}
-      <div className="rounded-xl border border-white/10 overflow-hidden">
-        <div className="flex items-center justify-between border-b border-white/10 px-5 py-3.5">
-          <p className="text-sm font-medium text-white/60">Transaksi Terbaru</p>
-          <Link href="/penerimaan" className="flex items-center gap-1 text-xs text-white/40 hover:text-white/70 transition-colors">
-            Lihat semua <ArrowRight className="h-3 w-3" />
-          </Link>
-        </div>
+      <Card className="overflow-hidden p-0">
+        <CardHeader className="border-b px-5 py-3.5">
+          <CardTitle className="text-sm font-medium text-foreground/60">Transaksi Terbaru</CardTitle>
+          <CardAction>
+            <Link href="/penerimaan" className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground/70 transition-colors">
+              Lihat semua <ArrowRight className="h-3 w-3" />
+            </Link>
+          </CardAction>
+        </CardHeader>
 
-        {stats.terbaru.length === 0 ? (
-          <div className="px-5 py-8 text-center text-sm text-white/30">
-            Belum ada transaksi
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-white/40 text-xs">Nomor Bukti</TableHead>
-                <TableHead className="text-white/40 text-xs">Tanggal</TableHead>
-                <TableHead className="text-white/40 text-xs">Jenis</TableHead>
-                <TableHead className="text-white/40 text-xs">Unit</TableHead>
-                <TableHead className="text-white/40 text-xs text-right">Jumlah</TableHead>
-                <TableHead className="text-white/40 text-xs">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {stats.terbaru.map((row) => (
-                <TableRow key={row.id} className="border-white/5 hover:bg-white/[0.02]">
-                  <TableCell className="py-3">
-                    <Link href={`/penerimaan/${row.id}`} className="text-sm font-mono text-blue-400 hover:underline">
-                      {row.nomor_bukti}
-                    </Link>
-                  </TableCell>
-                  <TableCell className="text-sm text-white/60 py-3">
-                    {format(new Date(row.tanggal_terima), "dd MMM yyyy", { locale: id })}
-                  </TableCell>
-                  <TableCell className="text-sm text-white/70 py-3">
-                    {row.jenis?.nama ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-sm text-white/50 py-3">
-                    {row.unit?.kode ?? "—"}
-                  </TableCell>
-                  <TableCell className="text-sm text-white/80 py-3 text-right font-medium">
-                    {rupiah(row.jumlah)}
-                  </TableCell>
-                  <TableCell className="py-3">
-                    <PenerimaanStatusBadge status={row.status as "draft" | "verified" | "void"} />
-                  </TableCell>
+        <CardContent className="p-0">
+          {stats.terbaru.length === 0 ? (
+            <div className="px-5 py-8 text-center text-sm text-muted-foreground/70">
+              Belum ada transaksi
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border hover:bg-transparent">
+                  <TableHead className="text-muted-foreground text-xs">Nomor Bukti</TableHead>
+                  <TableHead className="text-muted-foreground text-xs">Tanggal</TableHead>
+                  <TableHead className="text-muted-foreground text-xs">Jenis</TableHead>
+                  <TableHead className="text-muted-foreground text-xs">Unit</TableHead>
+                  <TableHead className="text-muted-foreground text-xs text-right">Jumlah</TableHead>
+                  <TableHead className="text-muted-foreground text-xs">Status</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </div>
+              </TableHeader>
+              <TableBody>
+                {stats.terbaru.map((row) => (
+                  <TableRow key={row.id} className="border-border/50 hover:bg-muted/20">
+                    <TableCell className="py-3">
+                      <Link href={`/penerimaan/${row.id}`} className="text-sm font-mono text-primary hover:underline">
+                        {row.nomor_bukti}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-sm text-foreground/60 py-3">
+                      {format(new Date(row.tanggal_terima), "dd MMM yyyy", { locale: id })}
+                    </TableCell>
+                    <TableCell className="text-sm text-foreground/70 py-3">
+                      {row.jenis?.nama ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-foreground/50 py-3">
+                      {row.unit?.kode ?? "—"}
+                    </TableCell>
+                    <TableCell className="text-sm text-foreground/80 py-3 text-right font-medium">
+                      {rupiah(row.jumlah)}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      <PenerimaanStatusBadge status={row.status as "draft" | "verified" | "void"} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
 
     </div>
   )
@@ -152,20 +155,22 @@ function StatCard({
     green:   "text-green-400  bg-green-500/10  ring-green-500/20",
     blue:    "text-blue-400   bg-blue-500/10   ring-blue-500/20",
     amber:   "text-amber-400  bg-amber-500/10  ring-amber-500/20",
-    default: "text-white/40   bg-white/5       ring-white/10",
+    default: "text-muted-foreground bg-muted/50 ring-border",
   }
 
   const inner = (
-    <div className="rounded-xl border border-white/10 px-5 py-4 flex flex-col gap-3">
-      <div className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${colors[color]}`}>
-        {icon}
-      </div>
-      <div>
-        <p className="text-xs text-white/40">{label}</p>
-        <p className="mt-1 text-xl font-semibold text-white/90">{value}</p>
-        {sub && <p className="mt-0.5 text-xs text-white/40">{sub}</p>}
-      </div>
-    </div>
+    <Card>
+      <CardContent className="flex flex-col gap-3">
+        <div className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ring-1 ${colors[color]}`}>
+          {icon}
+        </div>
+        <div>
+          <p className="text-xs text-muted-foreground">{label}</p>
+          <p className="mt-1 text-xl font-semibold text-foreground">{value}</p>
+          {sub && <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p>}
+        </div>
+      </CardContent>
+    </Card>
   )
 
   if (href) {

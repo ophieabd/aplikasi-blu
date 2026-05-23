@@ -6,6 +6,7 @@ import { format } from "date-fns"
 import { id } from "date-fns/locale"
 import { X, CheckCheck } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Card, CardContent } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { PenerimaanStatusBadge } from "@/components/penerimaan-status-badge"
@@ -67,26 +68,27 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="rounded-xl border border-white/10 overflow-hidden">
+      <Card className="overflow-hidden p-0">
+        <CardContent className="p-0">
         <Table>
           <TableHeader>
-            <TableRow className="border-white/10 hover:bg-transparent">
+            <TableRow className="border-border hover:bg-transparent">
               {isAdmin && (
                 <TableHead className="w-10 pl-4">
                   <Checkbox
                     checked={allDraftSelected}
                     onCheckedChange={toggleSelectAll}
                     disabled={draftIds.length === 0}
-                    className="border-white/20 data-[state=checked]:bg-white data-[state=checked]:text-zinc-900"
+                    className="border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                   />
                 </TableHead>
               )}
-              <TableHead className="text-white/40 text-xs">Nomor Bukti</TableHead>
-              <TableHead className="text-white/40 text-xs">Tanggal</TableHead>
-              <TableHead className="text-white/40 text-xs">Jenis</TableHead>
-              <TableHead className="text-white/40 text-xs">Unit</TableHead>
-              <TableHead className="text-white/40 text-xs text-right">Jumlah</TableHead>
-              <TableHead className="text-white/40 text-xs">Status</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Nomor Bukti</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Tanggal</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Jenis</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Unit</TableHead>
+              <TableHead className="text-muted-foreground text-xs text-right">Jumlah</TableHead>
+              <TableHead className="text-muted-foreground text-xs">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -96,7 +98,7 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
               return (
                 <TableRow
                   key={row.id}
-                  className={`border-white/5 hover:bg-white/[0.02] cursor-pointer ${isChecked ? "bg-white/[0.04]" : ""}`}
+                  className={`border-border/50 hover:bg-muted/20 cursor-pointer ${isChecked ? "bg-muted/40" : ""}`}
                 >
                   {isAdmin && (
                     <TableCell className="pl-4 py-3 w-10">
@@ -104,26 +106,26 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
                         <Checkbox
                           checked={isChecked}
                           onCheckedChange={() => toggleRow(row.id)}
-                          className="border-white/20 data-[state=checked]:bg-white data-[state=checked]:text-zinc-900"
+                          className="border-border data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                         />
                       )}
                     </TableCell>
                   )}
                   <TableCell className="py-3">
-                    <Link href={`/penerimaan/${row.id}`} className="text-sm font-mono text-blue-400 hover:underline">
+                    <Link href={`/penerimaan/${row.id}`} className="text-sm font-mono text-primary hover:underline">
                       {row.nomor_bukti}
                     </Link>
                   </TableCell>
-                  <TableCell className="text-sm text-white/60 py-3">
+                  <TableCell className="text-sm text-foreground/60 py-3">
                     {format(new Date(row.tanggal_terima), "dd MMM yyyy", { locale: id })}
                   </TableCell>
-                  <TableCell className="text-sm text-white/70 py-3">
+                  <TableCell className="text-sm text-foreground/70 py-3">
                     {(row.jenis as { nama?: string } | null)?.nama ?? "—"}
                   </TableCell>
-                  <TableCell className="text-sm text-white/50 py-3">
+                  <TableCell className="text-sm text-foreground/50 py-3">
                     {(row.unit as { kode?: string } | null)?.kode ?? "—"}
                   </TableCell>
-                  <TableCell className="text-sm text-white/80 py-3 text-right font-medium">
+                  <TableCell className="text-sm text-foreground/80 py-3 text-right font-medium">
                     {rupiah(row.jumlah)}
                   </TableCell>
                   <TableCell className="py-3">
@@ -134,19 +136,20 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
             })}
           </TableBody>
         </Table>
-      </div>
+        </CardContent>
+      </Card>
 
       {/* Floating bulk action bar */}
       {selected.size > 0 && (
-        <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-white/10 bg-background/95 backdrop-blur px-4 py-3 shadow-xl">
-          <span className="text-sm text-white/60 flex-1">
+        <div className="sticky bottom-4 flex items-center gap-3 rounded-xl border border-border bg-background/95 backdrop-blur px-4 py-3 shadow-xl">
+          <span className="text-sm text-foreground/60 flex-1">
             {selected.size} transaksi dipilih
           </span>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setSelected(new Set())}
-            className="text-white/40 hover:text-white gap-1.5"
+            className="text-muted-foreground hover:text-foreground gap-1.5"
           >
             <X className="h-3.5 w-3.5" />
             Batalkan
@@ -155,7 +158,7 @@ export function PenerimaanTable({ data, isAdmin }: { data: Row[]; isAdmin: boole
             size="sm"
             onClick={handleBulkVerify}
             disabled={pending}
-            className="gap-1.5 bg-green-600 hover:bg-green-500 text-white"
+            className="gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <CheckCheck className="h-3.5 w-3.5" />
             {pending ? "Memverifikasi..." : `Verifikasi (${selected.size})`}

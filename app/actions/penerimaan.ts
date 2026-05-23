@@ -157,12 +157,11 @@ export async function bulkVerifyPenerimaan(ids: string[]): Promise<ActionResult<
   if (ids.length === 0) return { ok: false, pesan: "Tidak ada transaksi dipilih" }
   if (ids.length > 100) return { ok: false, pesan: "Maksimal 100 transaksi sekaligus" }
   const sb = await createClient()
-  let berhasil = 0
-  let gagal = 0
-  for (const id of ids) {
-    const { error } = await sb.rpc("fn_verify_penerimaan", { p_id: id, p_user: profile.id })
-    if (error) gagal++; else berhasil++
-  }
+  const results = await Promise.all(
+    ids.map((id) => sb.rpc("fn_verify_penerimaan", { p_id: id, p_user: profile.id }))
+  )
+  const berhasil = results.filter((r) => !r.error).length
+  const gagal = results.filter((r) => !!r.error).length
   revalidatePath("/penerimaan")
   return { ok: true, data: { berhasil, gagal } }
 }

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { MasterTable, type MasterRow } from "@/components/master-table"
-import { Label } from "@/components/ui/label"
+import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
@@ -57,30 +57,30 @@ function RekeningForm({ row, onDone }: { row: Row | null; onDone: () => void }) 
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Kode</Label>
-        <Input {...register("kode")} placeholder="RK-01" className="bg-white/5 border-white/10 text-white" />
-        {errors.kode && <p className="text-xs text-red-400">{errors.kode.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nama Bank</Label>
-        <Input {...register("nama_bank")} placeholder="Bank BNI" className="bg-white/5 border-white/10 text-white" />
-        {errors.nama_bank && <p className="text-xs text-red-400">{errors.nama_bank.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nama Rekening</Label>
-        <Input {...register("nama_rekening")} placeholder="Nama pemilik rekening" className="bg-white/5 border-white/10 text-white" />
-        {errors.nama_rekening && <p className="text-xs text-red-400">{errors.nama_rekening.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Nomor Rekening</Label>
-        <Input {...register("nomor_rekening")} placeholder="0123456789" className="bg-white/5 border-white/10 text-white" />
-        {errors.nomor_rekening && <p className="text-xs text-red-400">{errors.nomor_rekening.message}</p>}
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label className="text-white/60 text-xs">Keterangan</Label>
-        <Textarea {...register("keterangan")} rows={2} placeholder="Opsional" className="bg-white/5 border-white/10 text-white resize-none" />
-      </div>
+      <Field data-invalid={!!errors.kode}>
+        <FieldLabel>Kode</FieldLabel>
+        <Input {...register("kode")} placeholder="RK-01" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.kode} />
+        <FieldError errors={[errors.kode]} />
+      </Field>
+      <Field data-invalid={!!errors.nama_bank}>
+        <FieldLabel>Nama Bank</FieldLabel>
+        <Input {...register("nama_bank")} placeholder="Bank BNI" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.nama_bank} />
+        <FieldError errors={[errors.nama_bank]} />
+      </Field>
+      <Field data-invalid={!!errors.nama_rekening}>
+        <FieldLabel>Nama Rekening</FieldLabel>
+        <Input {...register("nama_rekening")} placeholder="Nama pemilik rekening" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.nama_rekening} />
+        <FieldError errors={[errors.nama_rekening]} />
+      </Field>
+      <Field data-invalid={!!errors.nomor_rekening}>
+        <FieldLabel>Nomor Rekening</FieldLabel>
+        <Input {...register("nomor_rekening")} placeholder="0123456789" className="bg-muted/50 border-border text-foreground" aria-invalid={!!errors.nomor_rekening} />
+        <FieldError errors={[errors.nomor_rekening]} />
+      </Field>
+      <Field>
+        <FieldLabel>Keterangan</FieldLabel>
+        <Textarea {...register("keterangan")} rows={2} placeholder="Opsional" className="bg-muted/50 border-border text-foreground resize-none" />
+      </Field>
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Menyimpan..." : "Simpan"}
       </Button>

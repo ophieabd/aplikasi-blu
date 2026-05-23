@@ -2,9 +2,10 @@
 
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
-import * as XLSX from "xlsx"
-import { Upload, Download, CheckCircle2, XCircle } from "lucide-react"
+import { Upload, Download, CheckCircle2, XCircle, Info } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { toast } from "sonner"
 import { parseImportData, commitImport, type ImportRow, type ImportPreviewRow } from "@/app/actions/import-penerimaan"
@@ -19,7 +20,8 @@ const TEMPLATE_SAMPLE = [
   ["2026-05-01", "WSD", "", "FSH", "BSI", "TUNAI", "2500000", "", "Biaya Wisuda"],
 ]
 
-function downloadTemplate() {
+async function downloadTemplate() {
+  const XLSX = await import("xlsx")
   const wb = XLSX.utils.book_new()
   const ws = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS, ...TEMPLATE_SAMPLE])
   ws["!cols"] = TEMPLATE_HEADERS.map(() => ({ wch: 18 }))
@@ -38,8 +40,9 @@ export function ImportClient() {
 
   function processFile(file: File) {
     const reader = new FileReader()
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
+        const XLSX = await import("xlsx")
         const data = new Uint8Array(e.target?.result as ArrayBuffer)
         const wb = XLSX.read(data, { type: "array", cellDates: true })
         const ws = wb.Sheets[wb.SheetNames[0]]
@@ -100,9 +103,9 @@ export function ImportClient() {
   if (step === "done") {
     return (
       <div className="flex flex-col items-center gap-4 py-16 text-center">
-        <CheckCircle2 className="h-12 w-12 text-green-400" />
-        <p className="text-lg font-medium text-white">Import berhasil</p>
-        <p className="text-sm text-white/40">Data tersimpan sebagai draft, siap untuk diverifikasi</p>
+        <CheckCircle2 className="h-12 w-12 text-emerald-500" />
+        <p className="text-lg font-medium text-foreground">Import berhasil</p>
+        <p className="text-sm text-muted-foreground">Data tersimpan sebagai draft, siap untuk diverifikasi</p>
         <Button onClick={() => router.push("/penerimaan")}>Lihat Daftar Penerimaan</Button>
       </div>
     )
@@ -112,46 +115,48 @@ export function ImportClient() {
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-green-400 flex items-center gap-1.5">
-            <CheckCircle2 className="h-4 w-4" />{validCount} baris valid
-          </span>
+          <Badge className="gap-1.5 border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+            <CheckCircle2 className="h-3 w-3" />{validCount} baris valid
+          </Badge>
           {invalidCount > 0 && (
-            <span className="text-sm text-red-400 flex items-center gap-1.5">
-              <XCircle className="h-4 w-4" />{invalidCount} baris error (tidak akan diimpor)
-            </span>
+            <Badge variant="destructive" className="gap-1.5">
+              <XCircle className="h-3 w-3" />{invalidCount} baris error (tidak akan diimpor)
+            </Badge>
           )}
         </div>
 
-        <div className="rounded-xl border border-white/10 overflow-auto max-h-[60vh]">
+        <div className="rounded-xl border border-border overflow-auto max-h-[60vh]">
           <Table>
             <TableHeader>
-              <TableRow className="border-white/10 hover:bg-transparent">
-                <TableHead className="text-white/40 text-xs w-12">Baris</TableHead>
-                <TableHead className="text-white/40 text-xs">Tgl. Transaksi</TableHead>
-                <TableHead className="text-white/40 text-xs">Jenis</TableHead>
-                <TableHead className="text-white/40 text-xs">Unit</TableHead>
-                <TableHead className="text-white/40 text-xs text-right">Jumlah</TableHead>
-                <TableHead className="text-white/40 text-xs">Status</TableHead>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground text-xs w-12">Baris</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Tgl. Transaksi</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Jenis</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Unit</TableHead>
+                <TableHead className="text-muted-foreground text-xs text-right">Jumlah</TableHead>
+                <TableHead className="text-muted-foreground text-xs">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {preview.map((row) => (
                 <TableRow key={row.baris}
-                  className={`border-white/5 ${row.valid ? "hover:bg-white/[0.02]" : "bg-red-500/5"}`}>
-                  <TableCell className="text-xs text-white/40 py-2">{row.baris}</TableCell>
-                  <TableCell className="text-xs text-white/70 py-2">{row.tanggal_terima}</TableCell>
-                  <TableCell className="text-xs text-white/70 py-2">{row.kode_jenis}</TableCell>
-                  <TableCell className="text-xs text-white/70 py-2">{row.kode_unit}</TableCell>
-                  <TableCell className="text-xs text-white/70 py-2 text-right">
+                  className={`border-border/50 ${row.valid ? "hover:bg-muted/20" : "bg-destructive/5"}`}>
+                  <TableCell className="text-xs text-muted-foreground py-2">{row.baris}</TableCell>
+                  <TableCell className="text-xs text-foreground/70 py-2">{row.tanggal_terima}</TableCell>
+                  <TableCell className="text-xs text-foreground/70 py-2">{row.kode_jenis}</TableCell>
+                  <TableCell className="text-xs text-foreground/70 py-2">{row.kode_unit}</TableCell>
+                  <TableCell className="text-xs text-foreground/70 py-2 text-right">
                     {row.jumlah ? new Intl.NumberFormat("id-ID").format(row.jumlah) : "—"}
                   </TableCell>
                   <TableCell className="text-xs py-2">
                     {row.valid ? (
-                      <span className="text-green-400">✓ Valid</span>
+                      <Badge className="border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                        Valid
+                      </Badge>
                     ) : (
-                      <span className="text-red-400" title={row.errors.join(", ")}>
-                        ✗ {row.errors[0]}
-                      </span>
+                      <Badge variant="destructive" title={row.errors.join(", ")}>
+                        {row.errors[0]}
+                      </Badge>
                     )}
                   </TableCell>
                 </TableRow>
@@ -161,7 +166,7 @@ export function ImportClient() {
         </div>
 
         <div className="flex gap-3">
-          <Button variant="ghost" onClick={() => setStep("upload")} className="text-white/50">
+          <Button variant="ghost" onClick={() => setStep("upload")}>
             Kembali
           </Button>
           <Button onClick={handleCommit} disabled={pending || validCount === 0} className="flex-1">
@@ -176,7 +181,7 @@ export function ImportClient() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex justify-end">
-        <Button variant="ghost" size="sm" onClick={downloadTemplate} className="gap-1.5 text-white/50 hover:text-white">
+        <Button variant="ghost" size="sm" onClick={downloadTemplate} className="gap-1.5">
           <Download className="h-4 w-4" />
           Download Template
         </Button>
@@ -187,21 +192,24 @@ export function ImportClient() {
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         className={`flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed py-16 cursor-pointer transition-colors
-          ${dragOver ? "border-white/30 bg-white/5" : "border-white/10 hover:border-white/20"}`}
+          ${dragOver ? "border-primary/50 bg-primary/5" : "border-border hover:border-border/80"}`}
       >
-        <Upload className="h-8 w-8 text-white/30" />
+        <Upload className="h-8 w-8 text-muted-foreground/50" />
         <div className="text-center">
-          <p className="text-sm text-white/60">Drag & drop file di sini, atau klik untuk pilih</p>
-          <p className="text-xs text-white/30 mt-1">Format: .xlsx, .xls, .csv — Maks. 500 baris</p>
+          <p className="text-sm text-muted-foreground">Drag & drop file di sini, atau klik untuk pilih</p>
+          <p className="text-xs text-muted-foreground/50 mt-1">Format: .xlsx, .xls, .csv — Maks. 500 baris</p>
         </div>
         <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFile} className="hidden" />
       </label>
 
-      <div className="rounded-lg bg-white/5 p-4 text-xs text-white/40">
-        <p className="font-medium text-white/50 mb-2">Kolom yang diperlukan:</p>
-        <p className="font-mono leading-relaxed">{TEMPLATE_HEADERS.join(" | ")}</p>
-        <p className="mt-2">Kode menggunakan UPPERCASE. Download template untuk contoh.</p>
-      </div>
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertTitle>Kolom yang diperlukan</AlertTitle>
+        <AlertDescription>
+          <code className="font-mono text-xs leading-relaxed">{TEMPLATE_HEADERS.join(" | ")}</code>
+          <p className="mt-1">Kode menggunakan UPPERCASE. Download template untuk contoh.</p>
+        </AlertDescription>
+      </Alert>
     </div>
   )
 }

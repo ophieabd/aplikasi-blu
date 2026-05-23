@@ -1,7 +1,6 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import * as XLSX from "xlsx"
 import { Download, Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -26,7 +25,8 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
     router.push(`/laporan/bulanan?tahun=${t}&bulan=${b}`)
   }
 
-  function exportExcel() {
+  async function exportExcel() {
+    const XLSX = await import("xlsx")
     const rows: Record<string, unknown>[] = []
     for (const kat of byKategori) {
       rows.push({ "Kategori": kat.namaKategori, "Jenis": "", "Total": kat.total })
@@ -46,7 +46,7 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex gap-2">
           <Select value={String(bulan)} onValueChange={(v) => v != null && navigate(tahun, parseInt(v))}>
-            <SelectTrigger className="w-36 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-36 bg-muted/50 border-border text-foreground">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -54,7 +54,7 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
             </SelectContent>
           </Select>
           <Select value={String(tahun)} onValueChange={(v) => v != null && navigate(parseInt(v), bulan)}>
-            <SelectTrigger className="w-28 bg-white/5 border-white/10 text-white">
+            <SelectTrigger className="w-28 bg-muted/50 border-border text-foreground">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -63,10 +63,10 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
           </Select>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={exportExcel} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Download className="h-4 w-4" />Excel
           </Button>
-          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-white/50 hover:text-white">
+          <Button variant="ghost" size="sm" onClick={() => window.print()} className="gap-1.5 text-foreground/50 hover:text-foreground">
             <Printer className="h-4 w-4" />PDF
           </Button>
         </div>
@@ -77,25 +77,25 @@ export function LaporanBulananClient({ tahun, bulan, byKategori, total }: {
       ) : (
         <div className="flex flex-col gap-3">
           {byKategori.map((kat) => (
-            <div key={kat.kodeKategori} className="rounded-xl border border-white/10 overflow-hidden">
-              <div className="flex items-center justify-between bg-white/5 px-4 py-3">
-                <span className="text-sm font-semibold text-white/90">{kat.namaKategori}</span>
-                <span className="text-sm font-bold text-white">{rupiah(kat.total)}</span>
+            <div key={kat.kodeKategori} className="rounded-xl border border-border overflow-hidden">
+              <div className="flex items-center justify-between bg-muted/50 px-4 py-3">
+                <span className="text-sm font-semibold text-foreground">{kat.namaKategori}</span>
+                <span className="text-sm font-bold text-foreground">{rupiah(kat.total)}</span>
               </div>
-              <div className="divide-y divide-white/5">
+              <div className="divide-y divide-border/50">
                 {Object.values(kat.jenis).map((j) => (
                   <div key={j.kode} className="flex items-center justify-between px-6 py-2.5">
-                    <span className="text-sm text-white/60">{j.nama}</span>
-                    <span className="text-sm text-white/70">{rupiah(j.total)}</span>
+                    <span className="text-sm text-foreground/60">{j.nama}</span>
+                    <span className="text-sm text-foreground/70">{rupiah(j.total)}</span>
                   </div>
                 ))}
               </div>
             </div>
           ))}
 
-          <div className="flex items-center justify-between rounded-xl bg-white/10 px-4 py-3">
-            <span className="text-sm font-semibold text-white/80">TOTAL BULAN INI</span>
-            <span className="text-base font-bold text-white">{rupiah(total)}</span>
+          <div className="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
+            <span className="text-sm font-semibold text-foreground/80">TOTAL BULAN INI</span>
+            <span className="text-base font-bold text-foreground">{rupiah(total)}</span>
           </div>
         </div>
       )}
